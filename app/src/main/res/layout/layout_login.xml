@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:elevation="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="20dp">
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/edtEmail"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/colorPrimary"
+            android:textColorHighlight="@color/design_default_color_primary"
+            android:textSize="20sp"
+            app:met_singleLineEllipsis="true"
+            app:met_baseColor="@color/design_default_color_primary"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/design_default_color_primary"
+            />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/edtPassword"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:textColor="@color/colorPrimary"
+            android:textColorHighlight="@color/design_default_color_primary"
+            android:textSize="20sp"
+            app:met_singleLineEllipsis="true"
+            app:met_baseColor="@color/design_default_color_primary"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/design_default_color_primary"
+            />
+
+
+    </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>
