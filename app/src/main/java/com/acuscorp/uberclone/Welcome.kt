@@ -87,15 +87,7 @@ class Welcome : AppCompatActivity(), OnMapReadyCallback {
         }
         locationSwitcher.setA(listener)
         setupLocation()
-
-
-
-//            startLocationUpdate()
-//            displayLocation()
         Snackbar.make(mapFragment.view!!, "You are online", Snackbar.LENGTH_SHORT).show()
-
-
-
         mapFragment.getMapAsync(this)
     }
 
@@ -104,17 +96,18 @@ class Welcome : AppCompatActivity(), OnMapReadyCallback {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        when(requestCode){
+        when (requestCode) {
             My_PERMISSION_REQUEST_CODE -> {
-                if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     createLocationRequest()
-                    if(locationSwitcher.getDirection() == StickySwitch.Direction.RIGHT){
-                        displayLocation()
-                    }
+//                    if(locationSwitcher.getDirection() == StickySwitch.Direction.RIGHT){
+                    displayLocation()
+//                    }
                 }
             }
         }
     }
+
     private fun setupLocation() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -130,13 +123,13 @@ class Welcome : AppCompatActivity(), OnMapReadyCallback {
                 arrayOf(
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.ACCESS_FINE_LOCATION
-                ),My_PERMISSION_REQUEST_CODE
+                ), My_PERMISSION_REQUEST_CODE
             )
-        } else{
-                createLocationRequest()
-                if(locationSwitcher.getDirection() == StickySwitch.Direction.RIGHT){
-                    displayLocation()
-                }
+        } else {
+            createLocationRequest()
+//            if (locationSwitcher.getDirection() == StickySwitch.Direction.RIGHT) {
+                displayLocation()
+//            }
 
         }
 
@@ -182,28 +175,32 @@ class Welcome : AppCompatActivity(), OnMapReadyCallback {
         }
         LocationServices.getFusedLocationProviderClient(this)
             .lastLocation.addOnSuccessListener {
-                location = it
+                it?.let { location ->
+                    val latitude = location.latitude
+                    val longitude = location.longitude
 
-                val latitude = location.latitude
-                val longitude = location.longitude
-
-                val latLng = LatLng(latitude, longitude)
+                    val latLng = LatLng(latitude, longitude)
 
 
-                geoFire.setLocation(
-                    FirebaseAuth.getInstance().currentUser?.uid, GeoLocation(latitude, longitude)
-                ) { _, _ ->
-                    mCurrent = mMap.addMarker(
-                        MarkerOptions()
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.car))
-                            .position(latLng)
-                            .title("You")
-                    )
+                    geoFire.setLocation(
+                        FirebaseAuth.getInstance().currentUser?.uid,
+                        GeoLocation(latitude, longitude)
+                    ) { _, _ ->
+                        mCurrent.remove()
+                        mCurrent = mMap.addMarker(
+                            MarkerOptions()
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.car))
+                                .position(latLng)
+                                .title("You")
+                        )
 
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0F))
-                    rotateMarker(mCurrent, -360F, mMap)
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0F))
+                        rotateMarker(mCurrent, -360F, mMap)
+
+                    }
 
                 }
+
 
             }
 
@@ -229,7 +226,6 @@ class Welcome : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         runnable.run()
-
 
 
     }
@@ -266,7 +262,7 @@ class Welcome : AppCompatActivity(), OnMapReadyCallback {
             geoFire.setLocation(
                 FirebaseAuth.getInstance().currentUser?.uid, GeoLocation(latitude, longitude)
             ) { _, _ ->
-                mMap.clear()
+                mCurrent.remove()
                 mCurrent = mMap.addMarker(
                     MarkerOptions()
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.car))
@@ -280,22 +276,27 @@ class Welcome : AppCompatActivity(), OnMapReadyCallback {
             }
 
 
-            Snackbar.make(mapFragment.view!!, "Location has change ${locationResult?.lastLocation?.latitude}", Snackbar.LENGTH_SHORT)
+            Snackbar.make(
+                mapFragment.view!!,
+                "Location has change ${locationResult?.lastLocation?.latitude}",
+                Snackbar.LENGTH_SHORT
+            )
                 .show()
             super.onLocationResult(locationResult)
         }
 
         override fun onLocationAvailability(locationAvailability: LocationAvailability?) {
-            Snackbar.make(mapFragment.view!!, "Is location available ${locationAvailability?.isLocationAvailable}", Snackbar.LENGTH_SHORT)
+            Snackbar.make(
+                mapFragment.view!!,
+                "Is location available ${locationAvailability?.isLocationAvailable}",
+                Snackbar.LENGTH_SHORT
+            )
                 .show()
             super.onLocationAvailability(locationAvailability)
 
 
         }
     }
-
-
-
 
 
     /**
@@ -312,13 +313,12 @@ class Welcome : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         displayLocation()
-        startLocationUpdates()
+
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
-
 
 
 }
