@@ -1,7 +1,7 @@
 package com.acuscorp.uberclone
 
+
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -11,13 +11,16 @@ import android.widget.RelativeLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.acuscorp.uberclone.model.User
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.DatabaseReference
-import com.rengwuxian.materialedittext.MaterialEditText
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.rengwuxian.materialedittext.MaterialEditText
+import dmax.dialog.SpotsDialog
+import io.github.inflationx.calligraphy3.CalligraphyConfig
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor
+import io.github.inflationx.viewpump.ViewPump
+import io.github.inflationx.viewpump.ViewPumpContextWrapper
 
 
 class MainActivity : AppCompatActivity() {
@@ -30,17 +33,25 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rootLayout: RelativeLayout
 
 
-    override fun attachBaseContext(newBase: Context?) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase))
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        CalligraphyConfig.initDefault(
-            CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/uber_move.ttf")
-                .setFontAttrId(R.attr.fontPath)
+
+        ViewPump.init(
+            ViewPump.builder()
+                .addInterceptor(
+                    CalligraphyInterceptor(
+                        CalligraphyConfig.Builder()
+                            .setDefaultFontPath("fonts/uber_move.ttf")
+                            .setFontAttrId(R.attr.fontPath)
+                            .build()
+                    )
+                )
                 .build()
         )
 
@@ -50,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         users = db.getReference("Users")
 
         // init view
-        setContentView(R.layout.activity_main)
+
         btnSignIn = findViewById(R.id.btnSignIn)
         btnRegister = findViewById(R.id.btnRegister)
         rootLayout = findViewById(R.id.rootLayout)
@@ -82,6 +93,8 @@ class MainActivity : AppCompatActivity() {
         dialog.setPositiveButton("SIGN IN") { dialog, which ->
             dialog.dismiss()
 
+            btnSignIn.isEnabled = false
+
             // check validation
             if (TextUtils.isEmpty(edtEmail.text)) {
                 Snackbar.make(rootLayout, "Please enter email address", Snackbar.LENGTH_SHORT)
@@ -97,14 +110,18 @@ class MainActivity : AppCompatActivity() {
             //register new user
             val email = edtEmail.text.toString()
             val password = edtPassword.text.toString()
+            val waitingDialog = SpotsDialog.Builder().setContext(this).build()
 
-            auth.signInWithEmailAndPassword(email, password )
+            auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener {
-                    startActivity(Intent(this,Welcome::class.java))
+                    waitingDialog.dismiss()
+                    startActivity(Intent(this, Welcome::class.java))
                     finish()
                 }
                 .addOnFailureListener {
-                    Snackbar.make(rootLayout,"Failde $it",Snackbar.LENGTH_SHORT).show()
+                    waitingDialog.dismiss()
+                    btnSignIn.isEnabled = true
+                    Snackbar.make(rootLayout, "Failde $it", Snackbar.LENGTH_SHORT).show()
                 }
         }
         dialog.setNegativeButton("CANCEL") { dialog, which ->
