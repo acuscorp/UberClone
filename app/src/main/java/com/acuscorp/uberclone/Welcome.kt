@@ -186,7 +186,7 @@ class Welcome : AppCompatActivity(), OnMapReadyCallback {
                         FirebaseAuth.getInstance().currentUser?.uid,
                         GeoLocation(latitude, longitude)
                     ) { _, _ ->
-                        mCurrent.remove()
+
                         mCurrent = mMap.addMarker(
                             MarkerOptions()
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.car))
@@ -262,7 +262,7 @@ class Welcome : AppCompatActivity(), OnMapReadyCallback {
             geoFire.setLocation(
                 FirebaseAuth.getInstance().currentUser?.uid, GeoLocation(latitude, longitude)
             ) { _, _ ->
-                mCurrent.remove()
+                mMap.clear()
                 mCurrent = mMap.addMarker(
                     MarkerOptions()
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.car))
