@@ -93,6 +93,8 @@ class MainActivity : AppCompatActivity() {
         dialog.setPositiveButton("SIGN IN") { dialog, which ->
             dialog.dismiss()
 
+
+
             btnSignIn.isEnabled = false
 
             // check validation
@@ -111,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             val email = edtEmail.text.toString()
             val password = edtPassword.text.toString()
             val waitingDialog = SpotsDialog.Builder().setContext(this).build()
-
+            waitingDialog.show()
             auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener {
                     waitingDialog.dismiss()
